@@ -39,13 +39,25 @@ $router->addPost(
 );
 
 /**
- *  /auth/login
+ *  /entry/add
  */
 $router->addPost(
     '/entry/add',
     [
         'controller' => 'entry',
         'action' => 'add'
+    ]
+);
+
+
+/**
+ *  /entry/all
+ */
+$router->addPost(
+    '/entry/all',
+    [
+        'controller' => 'entry',
+        'action' => 'all'
     ]
 );
 
