@@ -47,6 +47,24 @@ $router->add(
     ]
 );
 
+$router->add(
+    '/tag/:params',
+    [
+        'controller' => 'entry',
+        'action' => 'tagArticle',
+        'tag' => 1
+    ]
+);
+
+$router->add(
+    '/category/:params',
+    [
+        'controller' => 'entry',
+        'action' => 'categoryArticle',
+        'category' => 1
+    ]
+);
+
 /**
  *  /entry/all
  */
@@ -66,6 +84,18 @@ $router->addPost(
     [
         'controller' => 'entry',
         'action' => 'add'
+    ]
+);
+
+/**
+ *  /entry/update/:int
+ */
+$router->addPost(
+    '/entry/update/:int',
+    [
+        'controller' => 'entry',
+        'action' => 'update',
+        'id' => 1
     ]
 );
 

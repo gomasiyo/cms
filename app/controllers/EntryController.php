@@ -121,6 +121,73 @@ class EntryController extends ControllerBase
 
     }
 
+    public function updateAction()
+    {
+
+        if($this->_status['response']['status'] && $this->_checkToken()) {
+            $this->_status['response']['status'] = false;
+            $this->_status['response']['code'] = 301;
+        }
+
+        $post = [
+            'entry' => true
+        ];
+        if($this->_status['response']['status'] && !$this->_getPost($post)) {
+            $this->_status['response']['status'] = false;
+            $this->_status['response']['code'] = 201;
+            $this->_status['response']['detail'] = $post['empty'];
+        }
+
+        $templateList = [
+            'title' => null,
+            'content' => null,
+        ];
+        $conditions = [
+            'content'
+        ];
+        if($this->_status['response']['status'] && !$this->_mergeArray($this->_post['entry'], $templateList, $conditions)) {
+            $this->_status['response']['status'] = false;
+            $this->_status['response']['code'] = 202;
+            $this->_status['response']['detail'] = $conditions;
+        }
+
+        $urlId = $this->dispatcher->getParam('id');
+        if(!$this->_status['response']['status'] && empty($urlId)) {
+            $this->_status['response']['status'] = false;
+            $this->_status['response']['code'] = 203;
+        }
+
+        if(!$this->_status['response']['status']) {
+            return $this->response->setJsonContent($this->_status);
+        }
+
+        $updateContent = [];
+        foreach($this->_post['entry'] as $post => $content) {
+            if(isset($content) && array_key_exists($post, $templateList)) {
+                $updateContent[$post] = $content;
+            }
+        }
+
+        $posts = Posts::findFirst($urlId);
+
+        if(!$post) {
+            $this->_status['response']['status'] = false;
+            $this->_status['response']['code'] = 404;
+            return $this->response->setJsonContent($this->_status);
+        }
+
+        $posts->assign($updateContent);
+
+        if(!$posts->save()) {
+            $this->_status['response']['status'] = false;
+            $this->_status['response']['code'] = 102;
+            return $this->response->setJsonContent($this->_status);
+        }
+
+        return $this->response->setJsonContent($this->_status);
+
+    }
+
     public function allAction()
     {
 
@@ -183,7 +250,7 @@ class EntryController extends ControllerBase
         if($tags) {
             foreach($tags as $tag) {
                 $tag_array[] = $tag->tag;
-            }
+           }
         }
 
         $categories = Categories::findByPosts_id($post->id);
@@ -194,7 +261,7 @@ class EntryController extends ControllerBase
             }
         }
 
-        $this->_status['response']['entry'][] = [
+        $this->_status['response']['entry'] = [
             'id' => $post->id,
             'author' => $post->users->name,
             'title' => $post->title,
@@ -202,6 +269,103 @@ class EntryController extends ControllerBase
             'tags' => $tag_array,
             'categoris' => $category_array
         ];
+
+        return $this->response->setJsonContent($this->_status);
+
+    }
+
+    public function tagArticleAction()
+    {
+
+        $tag_name = ltrim($this->dispatcher->getParam('tag'), '/');
+        $tags = Tags::findByTag($tag_name);
+
+        if(!count($tags)) {
+            $this->_status['response']['status'] = false;
+            $this->_status['response']['code'] = 404;
+            return $this->response->setJsonContent($this->_status);
+        }
+
+        $this->_status['response']['entry']['tag_title'] = $tag_name;
+
+        foreach($tags as $tag) {
+
+            $content = preg_split('/\[more\]/', $tag->posts->content);
+
+            $tags = Tags::findByPosts_id($tag->id);
+            $tag_array = [];
+            if($tags) {
+                foreach($tags as $tag) {
+                    $tag_array[] = $tag->tag;
+                }
+            }
+
+            $categories = Categories::findByPosts_id($tag->id);
+            $category_array = [];
+            if($categories) {
+                foreach($categories as $category) {
+                    $category_array[] = $category->category;
+                }
+            }
+
+            $this->_status['response']['entry'][] = [
+                'id' => $tag->posts_id,
+                'author' => $tag->posts->users->name,
+                'title' => $tag->posts->title,
+                'content' => $content,
+                'tags' => $tag_array,
+                'categoris' => $category_array
+            ];
+
+        }
+
+        return $this->response->setJsonContent($this->_status);
+
+    }
+
+
+    public function categoryArticleAction()
+    {
+
+        $category_name = ltrim($this->dispatcher->getParam('category'), '/');
+        $categories = Categories::findByCategory($category_name);
+
+        if(!count($categories)) {
+            $this->_status['response']['status'] = false;
+            $this->_status['response']['code'] = 404;
+            return $this->response->setJsonContent($this->_status);
+        }
+
+        foreach($categories as $category) {
+
+            $content = preg_split('/\[more\]/', $category->posts->content);
+
+            $tags = Tags::findByPosts_id($category->id);
+            $tag_array = [];
+            if($tags) {
+                foreach($tags as $tag) {
+                    $tag_array[] = $tag->tag;
+                }
+            }
+
+            $categories = Categories::findByPosts_id($category->id);
+            $category_array = [];
+            if($categories) {
+                foreach($categories as $category) {
+                    $category_array[] = $category->category;
+                }
+            }
+
+            $this->_status['response']['entry'][] = [
+                'id' => $category->posts->id,
+                'author' => $category->posts->users->name,
+                'title' => $category->posts->title,
+                'content' => $content,
+                'tags' => $tag_array,
+                'categoris' => $category_array
+            ];
+
+        }
 
         return $this->response->setJsonContent($this->_status);
 
