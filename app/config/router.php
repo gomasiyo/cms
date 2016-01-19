@@ -38,6 +38,26 @@ $router->addPost(
     ]
 );
 
+$router->add(
+    '/entry/:int',
+    [
+        'controller' => 'entry',
+        'action' => 'article',
+        'id' => 1
+    ]
+);
+
+/**
+ *  /entry/all
+ */
+$router->add(
+    '/entry/all',
+    [
+        'controller' => 'entry',
+        'action' => 'all'
+    ]
+);
+
 /**
  *  /entry/add
  */
@@ -49,17 +69,13 @@ $router->addPost(
     ]
 );
 
-
-/**
- *  /entry/all
- */
-$router->addPost(
-    '/entry/all',
-    [
-        'controller' => 'entry',
-        'action' => 'all'
-    ]
+$router->notFound(
+    array(
+        'controller' => 'status',
+        'action' => 'code404'
+    )
 );
+
 
 /**
  *  末尾のスラッシュを取り除く

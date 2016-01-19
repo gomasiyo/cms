@@ -42,6 +42,7 @@ class EntryController extends ControllerBase
         ];
         if($this->_status['response']['status'] && !$this->_mergeArray($this->_post['entry'], $templateList, $conditions)) {
             $this->_status['response']['status'] = false;
+
             $this->_status['response']['code'] = 202;
             $this->_status['response']['detail'] = $conditions;
         }
@@ -55,6 +56,7 @@ class EntryController extends ControllerBase
             [
                 'author' => $this->_id,
                 'title' => $this->_post['entry']['title'],
+
                 'content' => $this->_post['entry']['content']
             ]
 
@@ -122,43 +124,6 @@ class EntryController extends ControllerBase
     public function allAction()
     {
 
-        /*
-        $post = [
-            'options' => false
-        ];
-        if($this->_status['response']['status'] && !$this->_getPost($post)) {
-            $this->_status['response']['status'] = false;
-            $this->_status['response']['code'] = 201;
-            $this->_status['response']['detail'] = $post['empty'];
-        }
-
-        $templateList = [
-            'limit' => 'all',
-            'sort' => 1
-        ];
-        $conditions = [
-            'limit'
-        ];
-        if($this->_status['response']['status'] && !$this->_mergeArray($this->_post['options'], $templateList, $conditions)) {
-            $this->_status['response']['status'] = false;
-            $this->_status['response']['code'] = 202;
-            $this->_status['response']['detail'] = $conditions;
-        }
-
-
-        switch($_post['options']['sort']) {
-            case 1:
-                break;
-            case 2:
-                break;
-            default:
-
-        }
-
-        $posts = Posts::find();
-
-        */
-
         $posts = Posts::find([
             'order' => 'id ASC'
         ]);
@@ -193,6 +158,50 @@ class EntryController extends ControllerBase
             ];
 
         }
+
+        return $this->response->setJsonContent($this->_status);
+
+    }
+
+    public function articleAction()
+    {
+
+        $article_id = $this->dispatcher->getParam('id');
+        $post = Posts::findFirst($article_id);
+
+        if(!$post) {
+            $this->_status['response']['status'] = false;
+            $this->_status['response']['code'] = 404;
+            return $this->response->setJsonContent($this->_status);
+        }
+
+        $content = preg_split('/\[more\]/', $post->content);
+        $content = implode('', $content);
+
+        $tags = Tags::findByPosts_id($post->id);
+        $tag_array = [];
+        if($tags) {
+            foreach($tags as $tag) {
+                $tag_array[] = $tag->tag;
+            }
+        }
+
+        $categories = Categories::findByPosts_id($post->id);
+        $category_array = [];
+        if($categories) {
+            foreach($categories as $category) {
+                $category_array[] = $category->category;
+            }
+        }
+
+        $this->_status['response']['entry'][] = [
+            'id' => $post->id,
+            'author' => $post->users->name,
+            'title' => $post->title,
+            'content' => $content,
+            'tags' => $tag_array,
+            'categoris' => $category_array
+        ];
 
         return $this->response->setJsonContent($this->_status);
 
