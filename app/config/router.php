@@ -111,6 +111,18 @@ $router->addPost(
     ]
 );
 
+/**
+ *  /entry/comment/:int
+ */
+$router->addPost(
+    '/entry/comment/:int',
+    [
+        'controller' => 'comment',
+        'action' => 'set',
+        'id' => 1
+    ]
+);
+
 $router->notFound(
     array(
         'controller' => 'status',

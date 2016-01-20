@@ -181,7 +181,6 @@ class EntryController extends ControllerBase
         if(!$posts->save()) {
             $this->_status['response']['status'] = false;
             $this->_status['response']['code'] = 102;
-            return $this->response->setJsonContent($this->_status);
         }
 
         return $this->response->setJsonContent($this->_status);
@@ -217,7 +216,6 @@ class EntryController extends ControllerBase
         if(!$posts->delete()) {
             $this->_status['response']['status'] = false;
             $this->_status['response']['code'] = 102;
-            return $this->response->setJsonContent($this->_status);
         }
 
         return $this->response->setJsonContent($this->_status);
