@@ -3,18 +3,12 @@
 class StatusController extends ControllerBase
 {
 
-    public function initialize()
-    {
-
-        $this->view->disable();
-
-    }
-
     public function code404Action()
     {
-        $this->response->setStatusCode(404, 'Not Dound');
-
-        echo 404;
+        $this->response->setStatusCode(404, 'Not Found');
+        $this->_status['response']['status'] = false;
+        $this->_status['response']['code'] = 404;
+        return $this->response->setJsonContent($this->_status);
     }
 
 }
