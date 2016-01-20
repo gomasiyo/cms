@@ -36,6 +36,12 @@ class Comments extends \Phalcon\Mvc\Model
     public $comment;
 
     /**
+     *
+     * @var string
+     */
+    public $created_at;
+
+    /**
      * Initialize method for model.
      */
     public function initialize()

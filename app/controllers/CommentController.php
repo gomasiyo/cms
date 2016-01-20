@@ -23,14 +23,14 @@ class CommentController extends ControllerBase
             $this->_status['response']['code'] = 203;
         }
 
-        if(!$this->_status['response']['status']) {
-            return $this->response->setJsonContent($this->_status);
-        }
-
         $posts = Posts::findFirst($urlId);
-        if(!$posts) {
+        if($this->_status['response']['status'] && !$posts) {
             $this->_status['response']['status'] = false;
             $this->_status['response']['code'] = 404;
+        }
+
+        if(!$this->_status['response']['status']) {
+            return $this->response->setJsonContent($this->_status);
         }
 
         $comments = new Comments();
@@ -46,6 +46,36 @@ class CommentController extends ControllerBase
         if(!$comments->save()) {
             $this->_status['response']['status'] = false;
             $this->_status['response']['code'] = 102;
+        }
+
+        return $this->response->setJsonContent($this->_status);
+
+    }
+
+    public function listAction()
+    {
+
+        $comments = Comments::find([
+            'order' => 'id ASC'
+        ]);
+
+        if(!count($comments)) {
+            $this->_status['response']['status'] = false;
+            $this->_status['response']['code'] = 102;
+            return $this->response->setJsonContent($this->_status);
+        }
+
+        foreach($comments as $comment) {
+
+            $this->_status['response']['comment'][] = [
+                'post_id' => $comment->posts->id,
+                'posts_title' => $comment->posts->title,
+                'comment_name' => $comment->name,
+                'comment_email' => $comment->email,
+                'comment' => $comment->comment,
+                'date' => $comment->created_at
+            ];
+
         }
 
         return $this->response->setJsonContent($this->_status);

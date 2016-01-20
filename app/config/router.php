@@ -112,10 +112,21 @@ $router->addPost(
 );
 
 /**
- *  /entry/comment/:int
+ *  /comment/:int
+ */
+$router->add(
+    '/comment/list',
+    [
+        'controller' => 'comment',
+        'action' => 'list',
+    ]
+);
+
+/**
+ *  /comment/:int
  */
 $router->addPost(
-    '/entry/comment/:int',
+    '/comment/:int',
     [
         'controller' => 'comment',
         'action' => 'set',
