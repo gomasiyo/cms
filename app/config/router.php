@@ -99,6 +99,18 @@ $router->addPost(
     ]
 );
 
+/**
+ *  /entry/delete/:int
+ */
+$router->addPost(
+    '/entry/delete/:int',
+    [
+        'controller' => 'entry',
+        'action' => 'delete',
+        'id' => 1
+    ]
+);
+
 $router->notFound(
     array(
         'controller' => 'status',

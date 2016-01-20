@@ -170,7 +170,7 @@ class EntryController extends ControllerBase
 
         $posts = Posts::findFirst($urlId);
 
-        if(!$post) {
+        if(!$posts) {
             $this->_status['response']['status'] = false;
             $this->_status['response']['code'] = 404;
             return $this->response->setJsonContent($this->_status);
@@ -179,6 +179,42 @@ class EntryController extends ControllerBase
         $posts->assign($updateContent);
 
         if(!$posts->save()) {
+            $this->_status['response']['status'] = false;
+            $this->_status['response']['code'] = 102;
+            return $this->response->setJsonContent($this->_status);
+        }
+
+        return $this->response->setJsonContent($this->_status);
+
+    }
+
+    public function deleteAction()
+    {
+
+        if($this->_status['response']['status'] && $this->_checkToken()) {
+            $this->_status['response']['status'] = false;
+            $this->_status['response']['code'] = 301;
+        }
+
+        $urlId = $this->dispatcher->getParam('id');
+        if(!$this->_status['response']['status'] && empty($urlId)) {
+            $this->_status['response']['status'] = false;
+            $this->_status['response']['code'] = 203;
+        }
+
+        if(!$this->_status['response']['status']) {
+            return $this->response->setJsonContent($this->_status);
+        }
+
+        $posts = Posts::findFirst($urlId);
+
+        if(!$posts) {
+            $this->_status['response']['status'] = false;
+            $this->_status['response']['code'] = 404;
+            return $this->response->setJsonContent($this->_status);
+        }
+
+        if(!$posts->delete()) {
             $this->_status['response']['status'] = false;
             $this->_status['response']['code'] = 102;
             return $this->response->setJsonContent($this->_status);
