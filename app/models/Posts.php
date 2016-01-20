@@ -48,6 +48,14 @@ class Posts extends \Phalcon\Mvc\Model
         $this->hasMany('id', 'Comments', 'posts_id', array('alias' => 'Comments'));
         $this->hasMany('id', 'Tags', 'posts_id', array('alias' => 'Tags'));
         $this->belongsTo('author', 'Users', 'id', array('alias' => 'Users'));
+
+        $this->addBehavior(new Phalcon\Mvc\Model\Behavior\Timestampable(array(
+            'beforeValidationOnUpdate' => array(
+                'field'  => 'updated_at',
+                'format' => 'Y-m-d H:i:s'
+            )
+        )));
+
     }
 
     /**
