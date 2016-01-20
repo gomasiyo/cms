@@ -181,7 +181,6 @@ class EntryController extends ControllerBase
         if(!$posts->save()) {
             $this->_status['response']['status'] = false;
             $this->_status['response']['code'] = 102;
-            return $this->response->setJsonContent($this->_status);
         }
 
         return $this->response->setJsonContent($this->_status);
@@ -217,7 +216,6 @@ class EntryController extends ControllerBase
         if(!$posts->delete()) {
             $this->_status['response']['status'] = false;
             $this->_status['response']['code'] = 102;
-            return $this->response->setJsonContent($this->_status);
         }
 
         return $this->response->setJsonContent($this->_status);
@@ -297,13 +295,26 @@ class EntryController extends ControllerBase
             }
         }
 
+        $comments = Comments::findByPosts_id($post->id);
+        $comment_array = [];
+        if($comments) {
+            foreach($comments as $comment) {
+                $array = [];
+                $array['name'] = $comment->name;
+                $array['email'] = $comment->email;
+                $array['comment'] = $comment->comment;
+                $comment_array[] = $array;
+            }
+        }
+
         $this->_status['response']['entry'] = [
             'id' => $post->id,
             'author' => $post->users->name,
             'title' => $post->title,
             'content' => $content,
             'tags' => $tag_array,
-            'categoris' => $category_array
+            'categories' => $category_array,
+            'comments' => $comment_array
         ];
 
         return $this->response->setJsonContent($this->_status);

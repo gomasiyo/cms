@@ -36,27 +36,10 @@ class Comments extends \Phalcon\Mvc\Model
     public $comment;
 
     /**
-     * Validations and business logic
      *
-     * @return boolean
+     * @var string
      */
-    public function validation()
-    {
-        $this->validate(
-            new Email(
-                array(
-                    'field'    => 'email',
-                    'required' => true,
-                )
-            )
-        );
-
-        if ($this->validationHasFailed() == true) {
-            return false;
-        }
-
-        return true;
-    }
+    public $created_at;
 
     /**
      * Initialize method for model.
